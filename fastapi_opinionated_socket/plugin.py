@@ -50,7 +50,7 @@ class SocketPlugin(BasePlugin):
         """
         
         try:
-            logger.info("Initializing SocketPlugin...")
+            logger.info("Enabling SocketPlugin...")
             sio = AsyncServer(*args, **kwargs)
 
             socketio_path = kwargs.pop("socketio_path", "socket.io")
@@ -59,10 +59,9 @@ class SocketPlugin(BasePlugin):
             socket_app = ASGIApp(socketio_server=sio,socketio_path=socketio_path)
             fastapi_app.mount(socketio_path, socket_app)
             
-            logger.info("SocketPlugin initialized successfully.")
+            logger.info("SocketPlugin enabled successfully.")
             return sio
         except Exception as e:
-            logger.error(f"Failed to initialize SocketPlugin: {e}")
             raise PluginException("SocketPlugin", cause=e)
         
     # ----------------------
@@ -81,3 +80,7 @@ class SocketPlugin(BasePlugin):
             else:
                 logger.info(f"Registering event '{event}'")
                 sio.on(event)(handler)
+    
+    async def on_shutdown_async(self, app, fastapi_app, plugin_api: AsyncServer):
+        await plugin_api.shutdown()
+    
