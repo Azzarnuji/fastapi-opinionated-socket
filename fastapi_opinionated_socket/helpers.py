@@ -1,4 +1,5 @@
 from fastapi_opinionated.app import App
+from fastapi_opinionated_socket.events import register_socket_event
 from socketio import AsyncServer
 from fastapi_opinionated.exceptions.plugin_exception import PluginException
 
@@ -22,3 +23,20 @@ def socket_api()->AsyncServer:
     if not hasattr(App.plugin, "socket"):
         raise PluginException("SocketPlugin", cause=AttributeError("Socket plugin not enabled or not initialized"))
     return App.plugin.socket
+
+
+def SocketEvent(event_name: str, namespace: str | None = None):
+    """
+    Decorator to register a Socket.IO event handler lazily.
+    
+    Example:
+        @SocketEvent("join_room")
+        async def handler(...): ...
+
+        @SocketEvent("message", namespace="/chat")
+        async def handler(...): ...
+    """
+    def decorator(func):
+        register_socket_event(event_name, func, namespace)
+        return func
+    return decorator

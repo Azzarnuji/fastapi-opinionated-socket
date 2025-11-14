@@ -3,8 +3,9 @@ from fastapi_opinionated.shared.base_plugin import BasePlugin
 from fastapi_opinionated.decorators.app_cmd import AppCmd
 from fastapi_opinionated.shared.logger import ns_logger
 from fastapi_opinionated.exceptions.plugin_exception import PluginException
+from fastapi_opinionated_socket.events import consume_socket_events
 
-
+logger = ns_logger("SocketPlugin")
 class SocketPlugin(BasePlugin):
     public_name = "socket"
     command_name = "socket.enable"
@@ -47,7 +48,7 @@ class SocketPlugin(BasePlugin):
           the normalized socketio_path.
         - Returns the created AsyncServer instance on success.
         """
-        logger = ns_logger("SocketPlugin")
+        
         try:
             logger.info("Initializing SocketPlugin...")
             sio = AsyncServer(*args, **kwargs)
@@ -63,3 +64,20 @@ class SocketPlugin(BasePlugin):
         except Exception as e:
             logger.error(f"Failed to initialize SocketPlugin: {e}")
             raise PluginException("SocketPlugin", cause=e)
+        
+    # ----------------------
+    # Lifecycle hook
+    # ----------------------
+    def on_ready(self, app, fastapi_app, sio):
+
+        for item in consume_socket_events():
+            event = item["event"]
+            handler = item["handler"]
+            namespace = item["namespace"]
+
+            if namespace:
+                logger.info(f"Registering event '{event}' on namespace '{namespace}'")
+                sio.on(event, namespace=namespace)(handler)
+            else:
+                logger.info(f"Registering event '{event}'")
+                sio.on(event)(handler)
