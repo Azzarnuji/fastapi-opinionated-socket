@@ -10,7 +10,7 @@ class SocketPlugin(BasePlugin):
     public_name = "socket"
     command_name = "socket.enable"
     target_class = AsyncServer
-    required_config = True
+    required_config = False
     def __init__(self):
         self.handlers = {}
     
