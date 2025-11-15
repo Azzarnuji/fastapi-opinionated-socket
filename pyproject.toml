@@ -8,9 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi-opinionated-core @ file:///home/zarnuji/project/my-framework/fastapi-opinionated-core",
     "python-socketio (>=5.14.3,<6.0.0)",
     "python-engineio (>=4.12.3,<5.0.0)",
+    "fastapi-opinionated-core (>=0.1.2,<0.2.0)",
 ]
 packages = [
     { include = "fastapi_opinionated_socket" }
@@ -21,4 +21,3 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-fastapi-opinionated-core = {develop = true}

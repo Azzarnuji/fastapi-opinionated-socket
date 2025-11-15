@@ -216,20 +216,18 @@ standard = ["uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
 name = "fastapi-opinionated-core"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 optional = false
 python-versions = ">=3.12"
 groups = ["main"]
-files = []
-develop = true
+files = [
+    {file = "fastapi_opinionated_core-0.1.2-py3-none-any.whl", hash = "sha256:9f0ab3112574e6c6fd3e4c1716ad9db75ed6ebd9f984bcf98fd750c98b170622"},
+    {file = "fastapi_opinionated_core-0.1.2.tar.gz", hash = "sha256:e96fb900edd1974645939ffa6d2dca71f56be34d8e6df63420fe4e9ce0043b94"},
+]
 
 [package.dependencies]
 fastapi = {version = ">=0.121.1,<0.122.0", extras = ["all"]}
-
-[package.source]
-type = "directory"
-url = "../fastapi-opinionated-core"
 
 [[package]]
 name = "h11"
@@ -1784,4 +1782,4 @@ h11 = ">=0.16.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "f1d755c0f1cd70c9de8627624f31c92b72168499454529564491582e1bf52e98"
+content-hash = "886a9c366945602bed9855347ef60d869746a030dc62896e5a3aab13a9035988"
