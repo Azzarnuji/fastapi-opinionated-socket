@@ -1,7 +1,8 @@
 from fastapi_opinionated.app import App
-from fastapi_opinionated_socket.events import register_socket_event
+from fastapi_opinionated.registry.plugin import PluginRegistry
+from fastapi_opinionated.registry.plugin_store import PluginRegistryStore
+from fastapi_opinionated_socket.plugin import SocketPlugin
 from socketio import AsyncServer
-from fastapi_opinionated.exceptions.plugin_exception import PluginException
 
 def socket_api()->AsyncServer:
     """
@@ -20,8 +21,7 @@ def socket_api()->AsyncServer:
         - Ensure the application and its plugins have been initialized before calling this function,
           otherwise App.plugin.socket may be unset or raise an AttributeError.
     """
-    if not hasattr(App.plugin, "socket"):
-        raise PluginException("SocketPlugin", cause=AttributeError("Socket plugin not enabled or not initialized"))
+    PluginRegistry.ensure_enabled(SocketPlugin.public_name)
     return App.plugin.socket
 
 
@@ -37,6 +37,11 @@ def SocketEvent(event_name: str, namespace: str | None = None):
         async def handler(...): ...
     """
     def decorator(func):
-        register_socket_event(event_name, func, namespace)
+        PluginRegistry.ensure_enabled("socket")  # ensure socket plugin is enabled
+        PluginRegistryStore.add(SocketPlugin.public_name, "socket_event_handlers", {
+            "event": event_name,
+            "handler": func,
+            "namespace": namespace,
+        })
         return func
     return decorator

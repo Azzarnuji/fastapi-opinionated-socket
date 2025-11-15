@@ -1,15 +1,18 @@
+from fastapi_opinionated.registry.plugin_store import PluginRegistryStore
 from socketio import AsyncServer, ASGIApp
 from fastapi_opinionated.shared.base_plugin import BasePlugin
 from fastapi_opinionated.decorators.app_cmd import AppCmd
 from fastapi_opinionated.shared.logger import ns_logger
 from fastapi_opinionated.exceptions.plugin_exception import PluginException
-from fastapi_opinionated_socket.events import consume_socket_events
 
 logger = ns_logger("SocketPlugin")
 class SocketPlugin(BasePlugin):
     public_name = "socket"
     command_name = "socket.enable"
     target_class = AsyncServer
+    required_config = True
+    def __init__(self):
+        self.handlers = {}
     
     @staticmethod
     @AppCmd("socket.enable")
@@ -67,19 +70,22 @@ class SocketPlugin(BasePlugin):
     # ----------------------
     # Lifecycle hook
     # ----------------------
+    def on_controllers_loaded(self, app, fastapi_app):
+        self.handlers = PluginRegistryStore.get(self.public_name).get("socket_event_handlers", [])
+    
     def on_ready(self, app, fastapi_app, sio):
 
-        for item in consume_socket_events():
+        for item in self.handlers:
             event = item["event"]
             handler = item["handler"]
             namespace = item["namespace"]
 
             if namespace:
-                logger.info(f"Registering event '{event}' on namespace '{namespace}'")
                 sio.on(event, namespace=namespace)(handler)
+                logger.info(f"Registered '{event}' on namespace '{namespace}'")
             else:
-                logger.info(f"Registering event '{event}'")
                 sio.on(event)(handler)
+                logger.info(f"Registered '{event}'")
     
     async def on_shutdown_async(self, app, fastapi_app, plugin_api: AsyncServer):
         await plugin_api.shutdown()
