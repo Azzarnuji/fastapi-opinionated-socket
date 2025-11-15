@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "python-socketio (>=5.14.3,<6.0.0)",
     "python-engineio (>=4.12.3,<5.0.0)",
-    "fastapi-opinionated-core (>=0.1.2,<0.2.0)",
+    "fastapi-opinionated-core @ git+https://github.com/Azzarnuji/fastapi-opinionated-core.git",
 ]
 packages = [
     { include = "fastapi_opinionated_socket" }
